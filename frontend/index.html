@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pneumonia Detection System</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #4f46e5 0%, #2563eb 45%, #06b6d4 100%);
+      min-height: 100vh;
+      color: #1e293b;
+    }
+
+    .app-shell {
+      width: 100%;
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .main-card {
+      width: 100%;
+      min-height: calc(100vh - 56px);
+      background: rgba(255, 255, 255, 0.93);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 18px;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: #475569;
+      font-size: 0.98rem;
+    }
+
+    .badge {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .panel h2 {
+      margin: 0 0 18px;
+      font-size: 1.2rem;
+      color: #0f172a;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      outline: none;
+      font-size: 0.95rem;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #4f46e5;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #4f46e5, #2563eb);
+      color: white;
+      min-width: 170px;
+    }
+
+    .secondary-btn {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .status-box {
+      background: linear-gradient(135deg, #eef2ff, #ecfeff);
+      border: 1px solid #c7d2fe;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .status-box p {
+      margin: 6px 0;
+      color: #334155;
+    }
+
+    .result-highlight {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .metric-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metric-card .label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .metric-card .value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .image-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .image-card h3 {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    .image-frame {
+      width: 100%;
+      height: 280px;
+      border-radius: 14px;
+      background: #e2e8f0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .image-frame img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .placeholder {
+      color: #64748b;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .history-panel h2 {
+      margin-bottom: 16px;
+    }
+
+    .history-toolbar {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .history-toolbar input {
+      max-width: 260px;
+      background: #fff;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 950px;
+      background: white;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.93rem;
+    }
+
+    th {
+      background: linear-gradient(135deg, #e0e7ff, #dbeafe);
+      color: #1e293b;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.83rem;
+    }
+
+    .pill.pneumonia {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .pill.normal {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    @media (max-width: 1024px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-shell {
+        padding: 14px;
+      }
+
+      .main-card {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .form-grid,
+      .result-highlight,
+      .preview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-frame {
+        height: 220px;
+      }
+
+      .history-toolbar {
+        justify-content: stretch;
+      }
+
+      .history-toolbar input {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="main-card">
+      <div class="topbar">
+        <div class="title-wrap">
+          <h1>🫁 Pneumonia Detection System</h1>
+          <p>AI-assisted X-ray analysis with Grad-CAM visualization and patient history tracking</p>
+        </div>
+        <div class="badge">VGG16 + Grad-CAM + SQLite</div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panel">
+          <h2>Patient Information & Upload</h2>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="patientName">Patient Name</label>
+              <input type="text" id="patientName" placeholder="Enter patient name" />
+            </div>
+
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" placeholder="Enter age" />
+            </div>
+
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select id="gender">
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="fileInput">Chest X-ray Image</label>
+              <input type="file" id="fileInput" accept="image/*" />
+            </div>
+
+            <div class="form-group full">
+              <label for="notes">Symptoms / Clinical Notes</label>
+              <textarea id="notes" placeholder="Enter symptoms, remarks, or medical notes"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="primary-btn" onclick="upload()">Predict & Save Record</button>
+            <button class="secondary-btn" onclick="clearForm()">Clear Form</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Prediction Output</h2>
+
+          <div class="status-box">
+            <p id="status">Ready for prediction.</p>
+          </div>
+
+          <div class="result-highlight">
+            <div class="metric-card">
+              <div class="label">Prediction</div>
+              <div class="value" id="result">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="label">Confidence</div>
+              <div class="value" id="confidence">—</div>
+            </div>
+          </div>
+
+          <div class="preview-grid">
+            <div class="image-card">
+              <h3>Uploaded X-ray</h3>
+              <div class="image-frame" id="previewFrame">
+                <img id="preview" alt="Uploaded preview" style="display: none;" />
+                <div class="placeholder" id="previewPlaceholder">No image selected</div>
+              </div>
+            </div>
+
+            <div class="image-card">
+              <h3>Grad-CAM Visualization</h3>
+              <div class="image-frame" id="gradcamFrame">
+                <img id="gradcam" alt="Grad-CAM result" style="display: none;" />
+                <div class="placeholder" id="gradcamPlaceholder">Grad-CAM will appear here</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel history-panel">
+        <h2>Patient History</h2>
+
+        <div class="history-toolbar">
+          <input type="text" id="searchName" placeholder="Search by patient name" />
+          <button class="primary-btn" onclick="searchHistory()">Search</button>
+          <button class="secondary-btn" onclick="loadHistory()">Reset</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>File</th>
+                <th>Prediction</th>
+                <th>Confidence</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function upload() {
+      const name = document.getElementById("patientName").value.trim();
+      const age = document.getElementById("age").value.trim();
+      const gender = document.getElementById("gender").value;
+      const notes = document.getElementById("notes").value.trim();
+      const file = document.getElementById("fileInput").files[0];
+
+      if (!name || !age || !gender || !file) {
+        alert("Please fill all required fields and select an X-ray image.");
+        return;
+      }
+
+      document.getElementById("status").innerText = "Uploading image and generating prediction...";
+
+      const preview = document.getElementById("preview");
+      const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+      previewPlaceholder.style.display = "none";
+
+      const formData = new FormData();
+      formData.append("patient_name", name);
+      formData.append("age", age);
+      formData.append("gender", gender);
+      formData.append("notes", notes);
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/predict", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          document.getElementById("status").innerText = "Error: " + data.error;
+          return;
+        }
+
+        document.getElementById("result").innerText = data.prediction;
+        document.getElementById("confidence").innerText =
+          (data.confidence * 100).toFixed(2) + "%";
+
+        const gradcam = document.getElementById("gradcam");
+        const gradcamPlaceholder = document.getElementById("gradcamPlaceholder");
+
+        gradcam.src =
+          "http://127.0.0.1:8000/static/gradcam/" + data.gradcam_image + "?t=" + Date.now();
+        gradcam.style.display = "block";
+        gradcamPlaceholder.style.display = "none";
+
+        document.getElementById("status").innerText = "Prediction completed and record saved.";
+        loadHistory();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "Failed to connect to backend.";
+      }
+    }
+
+    async function loadHistory() {
+      const res = await fetch("http://127.0.0.1:8000/history");
+      const data = await res.json();
+
+      const body = document.getElementById("historyBody");
+      body.innerHTML = "";
+
+      data.forEach(item => {
+        const predictionClass =
+          item.prediction === "PNEUMONIA" ? "pill pneumonia" : "pill normal";
+
+        body.innerHTML += `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.patient_name}</td>
+            <td>${item.age}</td>
+            <td>${item.gender}</td>
+            <td>${item.filename}</td>
+            <td><span class="${predictionClass}">${item.prediction}</span></td>
+            <td>${(item.confidence * 100).toFixed(2)}%</td>
+            <td>${item.created_at}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function searchHistory() {
+      const name = document.getElementById("searchName").value.trim();
+
+      if (!name) {
+        loadHistory();
+        return;
+      }
+
+      const res = await fetch("http://127.0.0.1:8000/history/search?name=" + encodeURIComponent(name));
+      const data = await res.json();
+
+      const body = document.getElementById("historyBody");
+      body.innerHTML = "";
+
+      data.forEach(item => {
+        const predictionClass =
+          item.prediction === "PNEUMONIA" ? "pill pneumonia" : "pill normal";
+
+        body.innerHTML += `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.patient_name}</td>
+            <td>${item.age}</td>
+            <td>${item.gender}</td>
+            <td>${item.filename}</td>
+            <td><span class="${predictionClass}">${item.prediction}</span></td>
+            <td>${(item.confidence * 100).toFixed(2)}%</td>
+            <td>${item.created_at}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function clearForm() {
+      document.getElementById("patientName").value = "";
+      document.getElementById("age").value = "";
+      document.getElementById("gender").value = "";
+      document.getElementById("notes").value = "";
+      document.getElementById("fileInput").value = "";
+
+      const preview = document.getElementById("preview");
+      const gradcam = document.getElementById("gradcam");
+      const previewPlaceholder = document.getElementById("previewPlaceholder");
+      const gradcamPlaceholder = document.getElementById("gradcamPlaceholder");
+
+      preview.src = "";
+      preview.style.display = "none";
+      previewPlaceholder.style.display = "block";
+
+      gradcam.src = "";
+      gradcam.style.display = "none";
+      gradcamPlaceholder.style.display = "block";
+
+      document.getElementById("result").innerText = "—";
+      document.getElementById("confidence").innerText = "—";
+      document.getElementById("status").innerText = "Ready for prediction.";
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>
